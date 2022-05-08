@@ -1,34 +1,55 @@
-	global join_users
-	author_u = data.message.author.userId
-	if author_u in join_users:
-		if author_u in baned:
-			pass
-		else:
-			sub_client = amino.SubClient(comId=data.comId, profile=client.profile)
-			chatId = data.message.chatId
-			author_n = data.message.author.nickname
-			try:
-				sub_client.kick(userId=author_u, chatId=chatId, allowRejoin=False)
-				kick_ = 'OK.'
-			except:
-				kick_ = 'NO.'
-			try:
-				sub_client.ban(userId=author_u, reason='Подозрение в рейде типом 109')
-				ban_ = 'OK.'
-				baned.append(author_u)
-			except:
-				ban_ = 'NO.'
-			try:
-				sub_client.edit_chat(chatId=chatId, viewOnly=True)
-				edit_ = 'OK.'
-			except:
-				edit_ = 'NO.'
-			try:
-				sub_client.send_message(chatId=chatId, message=f'📣{author_n} подозревается в рейдерстве типом join-leave.\n\n🛑Попытка забанить: {ban_}\n\n🛑Попытка кикнуть из чата: {kick_}\n\n🛑Попытка включить режим "Только просмотр": {edit_}')
-			except:
-				console.print(f"\n[bold red]Не удалось Отправить сообщение о рейде[/]\n")
-	else:
-		join_users.append(author_u)
-#функция для бана рейдеров "join-leave" (Не тестировал, нет возможности, но в тиории работает)
+import os
+try:import amino
+except:
+	os.system('pip install amino.py')
+	import amino
+	os.system('cls')
+
+
+client = amino.Client()
+os.system('cls')
+print("made by CLOTI (Xsarz)  Telegram: t.me/DXsarz    GITHUB: https://github.com/xXxCLOTIxXx\n")
+print("На аккаунте должна быть лидерка")
+
+while True:
+	try:
+		gmail=input("Почта>> ")
+		password=input("пароль>> ")
+		client.login(email=gmail, password=password)
+		print(f"\nБот успешно авторизован под аккаунтом {gmail} !\n")
+		break
+	except Exception as error:
+		print(f"\n[bold red]Не удалось авторизовать бота\n\n {error}\n\n")
+
+while True:
+    try:
+        chat = client.get_from_code(input("Ссылка чат для чистки>>")).json
+        chatId = chat['extensions']['linkInfo']['objectId']
+        comId = chat['extensions']['linkInfo']['ndcId']
+        sub_client = amino.SubClient(comId=comId,profile=client.profile)
+        print("\n\nДанные успешно получены!\n\n")
+        break
+    except:
+        print("\n\nПроизошла ошибка!\n\n")
+
+while True:
+	try:
+		mess_del = int(input("Коло-во сообщений для удаления (Слишком много не нужно)>> "))
+		break
+	except:
+		print("\nВведите число!\n")
+
+def clear_chat(num, chatId, sub_client):
+	try:
+		messages = sub_client.get_chat_messages(chatId=chatId, size=num).json
+		for i in range(num):
+			mess_id = messages[i]['messageId']
+			sub_client.delete_message(chatId=chatId, messageId=mess_id, asStaff=True, reason='Чистка чата')
+	except:
+		print('Произошла ошибка при попытке очистить чат')
+
+
+clear_chat(mess_del,chatId,sub_client)
+
 print('Скрипт закончил свою работу!')
 
